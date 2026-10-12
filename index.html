@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'sha256-CenOzg7Ool8mHeRdat5Gj8wYVQE2U+A/d5keIwIZXbg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://formsubmit.co https://formspree.io; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'sha256-G2NMtqxvWdLwZfhNbU2DKQbc7N3KyDM8lGPahMcCDT4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://formsubmit.co https://formspree.io; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Alok Singh | Cybersecurity Instructor</title>
 <meta name="description" content="Alok Singh is a cybersecurity instructor and practitioner with 9+ years across technical training, curriculum development, penetration testing and SOC operations. Based in Saskatoon, Canada.">
@@ -878,7 +878,11 @@ const SITE = {
           form.reset();
           status.className = "enq-status ok"; status.textContent = "Thanks, " + d.name + ". Your enquiry was sent and I'll reply by email.";
         } catch (err) {
-          status.className = "enq-status bad"; status.innerHTML = 'Sorry, that didn\'t send. Please email me at <a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + "</a>.";
+          console.warn("Enquiry form: " + (err && err.message));   // e.g. FormSubmit "This form needs Activation…"
+          const pending = /activat/i.test(String(err && err.message));
+          status.className = "enq-status bad";
+          status.innerHTML = (pending ? "The form is still being set up, so your message wasn't sent. " : "Sorry, that didn't send. ") +
+            'Please email me at <a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + "</a>.";
         } finally { send.disabled = false; send.textContent = "Send Enquiry"; }
         return;
       }
