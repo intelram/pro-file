@@ -1,8 +1,8 @@
-# aloksingh.com
+# pro-file
 
 Personal portfolio of Alok Singh, cybersecurity instructor and practitioner.
 
-A single static page (`index.html`) hosted on GitHub Pages at **https://aloksingh.com**.
+A single static page (`index.html`) hosted on GitHub Pages at **https://intelram.github.io/pro-file/**.
 
 ## Editing content
 
@@ -22,7 +22,12 @@ and the page will not animate or fill in.
 |---|---|
 | `index.html` | The whole site |
 | `assets/Alok_Singh_Resume.pdf` | Resume linked from "View My Resume" |
-| `CNAME` | Tells GitHub Pages to serve the site at aloksingh.com |
 | `.nojekyll` | Serves files as-is (no Jekyll processing) |
 | `robots.txt`, `sitemap.xml` | Search-engine discovery |
 | `update-csp.mjs` | Recomputes the CSP script hash |
+
+## Using a custom domain later
+
+To serve the site from your own domain, add a file named `CNAME` containing just the domain
+(for example `example.com`), update the `canonical` / `og:url` tags in `index.html` and the URLs in
+`robots.txt` and `sitemap.xml`, then point the domain's DNS at GitHub Pages.

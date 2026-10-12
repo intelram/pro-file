@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aloksingh.com/sitemap.xml
+Sitemap: https://intelram.github.io/pro-file/sitemap.xml
