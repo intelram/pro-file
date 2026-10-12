@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'sha256-9JV67FEWD80Pbmi9SWWJR76XoRX77ff+bPRZMllRtW8='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://formspree.io; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'sha256-CenOzg7Ool8mHeRdat5Gj8wYVQE2U+A/d5keIwIZXbg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://formsubmit.co https://formspree.io; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Alok Singh | Cybersecurity Instructor</title>
 <meta name="description" content="Alok Singh is a cybersecurity instructor and practitioner with 9+ years across technical training, curriculum development, penetration testing and SOC operations. Based in Saskatoon, Canada.">
@@ -750,10 +750,11 @@ const SITE = {
   },
 
   marquee: ["PENTESTING","DFIR","SOC","GRC","MITRE ATT&CK","ZERO TRUST","CLOUD SECURITY","AI SECURITY"],
-  // Enquiry form. Leave formEndpoint empty to open the visitor's email app with the message filled in,
-  // or paste a Formspree endpoint (https://formspree.io/f/xxxxxxx) to receive submissions directly.
+  // Enquiry form. Submissions are emailed to you via FormSubmit (formsubmit.co, free, no account).
+  // The very first submission sends an activation email to this address: click "Activate Form" once.
+  // Leave formEndpoint empty to fall back to opening the visitor's email app instead.
   enquiry: {
-    formEndpoint: "",
+    formEndpoint: "https://formsubmit.co/ajax/aloklakhansingh@gmail.com",
     title: "Training, hiring or a security project?",
     lead: "Tell me what you need. I work with teams, colleges and organisations across Canada and the US.",
     offers: [
@@ -869,8 +870,11 @@ const SITE = {
       if (E.formEndpoint) {
         send.disabled = true; send.textContent = "Sending…";
         try {
-          const r = await fetch(E.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ ...d, _subject: subject, _replyto: d.email }) });
-          if (!r.ok) throw new Error(r.status);
+          const r = await fetch(E.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({ Name: d.name, Email: d.email, Organisation: d.organisation || "-", "Team / class size": d.size || "-", "Interested in": d.topic, Message: d.message,
+              _subject: subject, _replyto: d.email, _template: "table", _captcha: "false" }) });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok || j.success === false || j.success === "false") throw new Error(j.message || r.status);
           form.reset();
           status.className = "enq-status ok"; status.textContent = "Thanks, " + d.name + ". Your enquiry was sent and I'll reply by email.";
         } catch (err) {
