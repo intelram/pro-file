@@ -1,0 +1,11 @@
+# Security headers. Works on Cloudflare Pages / Netlify-style static hosts.
+# If your host ignores this file, set the same headers via Cloudflare dashboard
+# (Rules -> Transform Rules -> Modify Response Header) instead.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
