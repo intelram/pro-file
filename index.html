@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'sha256-G2NMtqxvWdLwZfhNbU2DKQbc7N3KyDM8lGPahMcCDT4='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://formsubmit.co https://formspree.io; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'sha256-e2EpSST/JN9D9J77R4tJKnVcOhqZUaB/v1DTvrMf03Q='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://formsubmit.co https://formspree.io; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Alok Singh | Cybersecurity Instructor</title>
 <meta name="description" content="Alok Singh is a cybersecurity instructor and practitioner with 9+ years across technical training, curriculum development, penetration testing and SOC operations. Based in Saskatoon, Canada.">
@@ -357,6 +357,19 @@ fieldset.fld{border:0;margin:0;padding:0;min-width:0}
 .topics label:hover span{border-color:var(--ink)}
 .topics input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}
 .topics input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.courses{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.courses label{position:relative;cursor:pointer;font-family:var(--display);font-size:.92rem;letter-spacing:0;text-transform:none;color:var(--ink)}
+.courses input{position:absolute;opacity:0;width:1px;height:1px}
+.courses span{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;transition:background .2s,color .2s,border-color .2s,transform .2s var(--ease)}
+.courses span::before{content:"";flex:none;width:15px;height:15px;border-radius:5px;border:1.6px solid var(--mute);background:center/11px no-repeat;transition:background-color .2s,border-color .2s}
+.courses label:hover span{border-color:var(--ink);transform:translateY(-1px)}
+.courses input:checked+span{background:var(--blue);color:#fff;border-color:var(--blue)}
+.courses input:checked+span::before{border-color:#fff;background-color:#fff;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233B5BFF' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E")}
+.courses input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.courses-count{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--blue);margin-left:8px;text-transform:none}
+.courses-count:empty{display:none}
+.char-count{font-family:var(--mono);font-size:11px;color:var(--soft);text-align:right;margin:5px 0 0;transition:color .2s}
+.char-count.warn{color:#C2410C}
 .hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
 .enq-actions{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:4px}
 .enq-actions .pill{border:0;cursor:pointer}
@@ -574,7 +587,8 @@ footer{border-top:1px solid var(--line);padding:26px 0 30px}
       <div class="fld"><label for="f-org">Organisation</label><input id="f-org" name="organisation" autocomplete="organization" maxlength="120"></div>
       <div class="fld"><label for="f-size">Team / class size</label><select id="f-size" name="size"></select></div>
       <fieldset class="fld full"><legend>I'm interested in <b aria-hidden="true">*</b></legend><div class="topics" id="f-topics"></div><p class="err" id="e-topic" aria-live="polite"></p></fieldset>
-      <div class="fld full"><label for="f-msg">Message <b aria-hidden="true">*</b></label><textarea id="f-msg" name="message" required maxlength="3000" placeholder="What do you need, and by when?"></textarea><p class="err" id="e-msg" aria-live="polite"></p></div>
+      <fieldset class="fld full" id="f-courses-wrap" hidden><legend>Which courses? <span class="courses-count" id="f-courses-count" aria-live="polite"></span></legend><div class="courses" id="f-courses"></div></fieldset>
+      <div class="fld full"><label for="f-msg">Message <b aria-hidden="true">*</b></label><textarea id="f-msg" name="message" required maxlength="3000" placeholder="What do you need, and by when?"></textarea><p class="char-count" id="f-count" aria-hidden="true">0 / 3000</p><p class="err" id="e-msg" aria-live="polite"></p></div>
       <div class="hp" aria-hidden="true"><label for="f-web">Leave this empty</label><input id="f-web" name="website" tabindex="-1" autocomplete="off"></div>
       <div class="enq-actions"><button class="pill" type="submit" id="enq-send">Send Enquiry</button><p class="enq-status" id="enq-status" role="status" aria-live="polite"></p></div>
     </form>
@@ -758,12 +772,18 @@ const SITE = {
     title: "Training, hiring or a security project?",
     lead: "Tell me what you need. I work with teams, colleges and organisations across Canada and the US.",
     offers: [
-      "Job-ready cybersecurity training for teams and cohorts (live online or in person)",
+      "Company-ready training for your team: pick from 9 hands-on courses, from penetration testing to Splunk SIEM",
       "Instructor and technical trainer roles",
       "Curriculum, lab and assessment development",
       "Security consulting: penetration testing, SOC and AI security"
     ],
     topics: ["Cybersecurity training", "Hiring: instructor / trainer", "Curriculum & labs", "Security consulting", "Workshop / speaking", "Something else"],
+    // Courses offered as company-ready training. Shown when the visitor picks the training topic below.
+    trainingTopic: "Cybersecurity training",
+    courses: [
+      "Penetration Testing", "Ethical Hacking", "Cyber Forensics", "Software Reverse Engineering", "Splunk SIEM",
+      "System Intelligence (SI)", "AI Software Development", "Windows Active Directory Penetration Testing", "Linux"
+    ],
     sizes: ["Just me", "2–10 people", "11–50 people", "50+ people", "Not sure yet"],
     note: "Your details are used only to reply to your enquiry."
   },
@@ -842,7 +862,26 @@ const SITE = {
     $("#f-size").innerHTML = '<option value="">Select…</option>' + E.sizes.map((z) => "<option>" + esc(z) + "</option>").join("");
     $("#f-topics").innerHTML = E.topics.map((t, i) => '<label><input type="radio" name="topic" value="' + esc(t) + '"' + (i === 0 ? " required" : "") + "><span>" + esc(t) + "</span></label>").join("");
 
+    // Course picker: appears when the training topic is chosen, with a live "selected" counter
+    const cWrap = $("#f-courses-wrap"), cCount = $("#f-courses-count"), msgCount = $("#f-count");
+    $("#f-courses").innerHTML = E.courses.map((c) => '<label><input type="checkbox" name="course" value="' + esc(c) + '"><span>' + esc(c) + "</span></label>").join("");
+    const chosenCourses = () => $$('input[name="course"]:checked', form).map((i) => i.value);
+    const syncCourses = () => {
+      const topic = form.querySelector('input[name="topic"]:checked');
+      const show = !!topic && topic.value === E.trainingTopic;
+      cWrap.hidden = !show;
+      const n = chosenCourses().length;
+      cCount.textContent = n ? n + " selected" : "";
+    };
+    form.addEventListener("change", (e) => { if (e.target.name === "topic" || e.target.name === "course") syncCourses(); });
+    const syncMsgCount = () => {
+      const len = fields.msg.value.length, max = +fields.msg.getAttribute("maxlength");
+      msgCount.textContent = len + " / " + max;
+      msgCount.classList.toggle("warn", len > max * 0.9);
+    };
+
     const fields = { name: $("#f-name"), email: $("#f-email"), msg: $("#f-msg") };
+    fields.msg.addEventListener("input", syncMsgCount);
     const setErr = (id, el, text) => { $("#" + id).textContent = text; if (el) el.setAttribute("aria-invalid", text ? "true" : "false"); };
     function validate() {
       let first = null;
@@ -864,18 +903,20 @@ const SITE = {
       if (bad) { bad.focus(); status.className = "enq-status bad"; status.textContent = "Please fix the highlighted fields."; return; }
       const d = {
         name: fields.name.value.trim(), email: fields.email.value.trim(), organisation: $("#f-org").value.trim(),
-        size: $("#f-size").value, topic: form.querySelector('input[name="topic"]:checked').value, message: fields.msg.value.trim()
+        size: $("#f-size").value, topic: form.querySelector('input[name="topic"]:checked').value, message: fields.msg.value.trim(),
+        courses: d_isTraining() ? chosenCourses() : []
       };
-      const subject = "Enquiry: " + d.topic + " (" + d.name + ")";
+      function d_isTraining() { return form.querySelector('input[name="topic"]:checked').value === E.trainingTopic; }
+      const subject = "Enquiry: " + d.topic + (d.courses.length ? " [" + d.courses.length + " course" + (d.courses.length > 1 ? "s" : "") + "]" : "") + " (" + d.name + ")";
       if (E.formEndpoint) {
         send.disabled = true; send.textContent = "Sending…";
         try {
           const r = await fetch(E.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
-            body: JSON.stringify({ Name: d.name, Email: d.email, Organisation: d.organisation || "-", "Team / class size": d.size || "-", "Interested in": d.topic, Message: d.message,
+            body: JSON.stringify({ Name: d.name, Email: d.email, Organisation: d.organisation || "-", "Team / class size": d.size || "-", "Interested in": d.topic, "Courses requested": d.courses.length ? d.courses.join(", ") : "-", Message: d.message,
               _subject: subject, _replyto: d.email, _template: "table", _captcha: "false" }) });
           const j = await r.json().catch(() => ({}));
           if (!r.ok || j.success === false || j.success === "false") throw new Error(j.message || r.status);
-          form.reset();
+          form.reset(); syncCourses(); syncMsgCount();
           status.className = "enq-status ok"; status.textContent = "Thanks, " + d.name + ". Your enquiry was sent and I'll reply by email.";
         } catch (err) {
           console.warn("Enquiry form: " + (err && err.message));   // e.g. FormSubmit "This form needs Activation…"
@@ -886,7 +927,7 @@ const SITE = {
         } finally { send.disabled = false; send.textContent = "Send Enquiry"; }
         return;
       }
-      const body = ["Name: " + d.name, "Email: " + d.email, d.organisation ? "Organisation: " + d.organisation : "", d.size ? "Team / class size: " + d.size : "", "Interested in: " + d.topic].filter(Boolean).join("\n") + "\n\n" + d.message;
+      const body = ["Name: " + d.name, "Email: " + d.email, d.organisation ? "Organisation: " + d.organisation : "", d.size ? "Team / class size: " + d.size : "", "Interested in: " + d.topic, d.courses.length ? "Courses requested: " + d.courses.join(", ") : ""].filter(Boolean).join("\n") + "\n\n" + d.message;
       window.location.href = "mailto:" + SITE.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
       status.className = "enq-status ok"; status.textContent = "Your email app should open with the enquiry ready to send. If it doesn't, email " + SITE.email + ".";
     });
