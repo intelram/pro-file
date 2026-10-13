@@ -1,2 +1,2 @@
 # Block access to the version-control directory if the host serves it.
-/.git/*  /404.html  404
+/.git/*  /404.html  301
